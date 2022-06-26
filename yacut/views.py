@@ -1,7 +1,7 @@
 import os
 from random import randint
 
-from flask import render_template, flash
+from flask import redirect, render_template, flash, abort
 
 from . import app, db
 from .forms import UrlMapForm
@@ -56,6 +56,14 @@ def index_view():
             form=form,
             short_url=full_short_url)
     return render_template('urlsform.html', form=form)
+
+
+@app.route('/<string:short>')
+def redirect_by_short_url(short):
+    url = URL_map.query.filter_by(short=short).first()
+    if url is None:
+        abort(404)
+    return redirect(url.original)
 
 
 if __name__ == '__main__':
