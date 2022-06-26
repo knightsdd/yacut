@@ -34,6 +34,15 @@
                       {% endfor %}
                     {% endif %}
                   </p>
+                  <p>
+                    {% with messages = get_flashed_messages() %}
+                      {% if messages %}
+                        {% for message in messages %}
+                        <span style="color:red"> {{ message }} </span>
+                        {% endfor %}
+                      {% endif %}
+                    {% endwith %}
+                  </p>
                 </div>
                 {{ form.submit(class="btn btn-primary") }}
               </div>
@@ -50,7 +59,10 @@
           </div>
           <div class="col-sm">
             <p class="text-center">
+              {% if short_url %}
               <h5 class="text-center">Ваша новая ссылка готова:</h5>
+                <br> <a href="{{ short_url }}">{{ short_url }}</a>
+              {% endif %}
             </p>
           </div>
           <div class="col-sm">
