@@ -1,8 +1,10 @@
+import os
 from flask import jsonify, request
 
-from . import app, db, MAX_LEN_SHORT_ID
+from . import app, db
 from .error_handlers import InvalidAPIUsage
 from .models import URL_map
+from .utils import check_short_id
 from .views import get_unique_short_id
 
 
@@ -19,18 +21,20 @@ def get_url(short_id):
 def create_url():
     data = request.get_json()
     custom_id = ''
-    if len(data) == 0:
+    if data is None:
         raise InvalidAPIUsage('Отсутствует тело запроса')
     if 'url' not in data:
         raise InvalidAPIUsage('\"url\" является обязательным полем!')
     if 'custom_id' in data:
         custom_id = data['custom_id']
-        if len(custom_id) > MAX_LEN_SHORT_ID:
+        if custom_id in ['', None]:
+            custom_id = get_unique_short_id()
+        elif not check_short_id(custom_id):
             raise InvalidAPIUsage(
                 'Указано недопустимое имя для короткой ссылки')
-        if URL_map.query.filter_by(short=custom_id).first() is not None:
+        elif URL_map.query.filter_by(short=custom_id).first() is not None:
             raise InvalidAPIUsage(
-                'Указано недопустимое имя для короткой ссылки')
+                f'Имя "{custom_id}" уже занято.')
     else:
         custom_id = get_unique_short_id()
 
@@ -39,5 +43,5 @@ def create_url():
     db.session.commit()
     return jsonify(dict(
         url=new_url.original,
-        custom_id=new_url.short)
-    )
+        short_link=f'{os.getenv("BASE_URL")}{new_url.short}')
+    ), 201
