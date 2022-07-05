@@ -14,11 +14,13 @@ def index_view():
     if form.validate_on_submit():
         original_link = form.original_link.data
         custom_id = form.custom_id.data
-        if custom_id == '':
+        if form.custom_id.data is None:
+            custom_id = get_unique_short_id()
+        elif custom_id == '':
             custom_id = get_unique_short_id()
         else:
             if URL_map.query.filter_by(short=custom_id).first() is not None:
-                flash('Такая короткая ссылка уже занята!')
+                flash(f'Имя {custom_id} уже занято!')
                 return render_template('urlsform.html', form=form)
 
         new_url = URL_map(
