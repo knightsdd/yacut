@@ -43,7 +43,7 @@ def index_view():
             if URL_map.query.filter_by(short=custom_id).first() is not None:
                 flash('Такая короткая ссылка уже занята!')
                 return render_template('urlsform.html', form=form)
-        
+
         new_url = URL_map(
             original=original_link,
             short=custom_id)
