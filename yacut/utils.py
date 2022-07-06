@@ -1,32 +1,24 @@
+import random
 import re
-from random import randint
+import string
 
+from . import MAX_LENGTH_SHORT
 from .models import URL_map
 
 
-def get_short_id() -> str:
-    rand_list = []
-    for _ in range(6):
-        i = randint(0, 2)
-        if i == 0:
-            rand_list.append(chr(randint(48, 57)))
-        elif i == 1:
-            rand_list.append(chr(randint(65, 90)))
-        else:
-            rand_list.append(chr(randint(97, 122)))
-
+def get_short_id(max_length) -> str:
+    rand_list = random.choices(string.ascii_letters + string.digits,
+                               k=max_length)
     return ''.join(rand_list)
 
 
 def get_unique_short_id() -> str:
-    items = URL_map.query.all()
-    current_idents = [item.short for item in items]
-    new_ident = get_short_id()
-    while new_ident in current_idents:
-        new_ident = get_short_id()
+    new_ident = get_short_id(MAX_LENGTH_SHORT)
+    while URL_map.query.filter_by(short=new_ident).first() is not None:
+        new_ident = get_short_id(MAX_LENGTH_SHORT)
     return new_ident
 
 
-def check_short_id(string):
+def check_short_id(string) -> bool:
     match = re.fullmatch(r'[a-zA-Z|\d]{1,16}', string)
     return (True if match else False)

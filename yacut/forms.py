@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, URLField
-from wtforms.validators import DataRequired, Length, Optional
+from wtforms.validators import DataRequired, Length, Optional, Regexp
 
 
 class UrlMapForm(FlaskForm):
@@ -11,7 +11,9 @@ class UrlMapForm(FlaskForm):
     )
     custom_id = StringField(
         'Ваш вариант короткой ссылки',
-        validators=[Length(1, 16, message='Максимальная длинна ссылки 16 символов'),
+        validators=[Length(max=16, message='Максимальная длинна ссылки 16 символов'),
+                    Regexp(regex=r'^[a-zA-Z|\d]*$',
+                           message='Указано недопустимое имя для короткой ссылки'),
                     Optional()]
     )
     submit = SubmitField('Создать')

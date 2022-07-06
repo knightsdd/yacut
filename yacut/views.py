@@ -1,4 +1,4 @@
-from flask import abort, flash, redirect, render_template
+from flask import flash, redirect, render_template
 
 from . import app, db
 from .forms import UrlMapForm
@@ -14,15 +14,11 @@ def index_view():
     if form.validate_on_submit():
         original_link = form.original_link.data
         custom_id = form.custom_id.data
-        if form.custom_id.data is None:
+        if custom_id is None or custom_id == '':
             custom_id = get_unique_short_id()
-        elif custom_id == '':
-            custom_id = get_unique_short_id()
-        else:
-            if URL_map.query.filter_by(short=custom_id).first() is not None:
-                flash(f'Имя {custom_id} уже занято!')
-                return render_template('urlsform.html', form=form)
-
+        if URL_map.query.filter_by(short=custom_id).first() is not None:
+            flash(f'Имя {custom_id} уже занято!')
+            return render_template('urlsform.html', form=form)
         new_url = URL_map(
             original=original_link,
             short=custom_id)
@@ -38,11 +34,5 @@ def index_view():
 
 @app.route('/<string:short>')
 def redirect_by_short_url(short):
-    url = URL_map.query.filter_by(short=short).first()
-    if url is None:
-        abort(404)
+    url = URL_map.query.filter_by(short=short).first_or_404()
     return redirect(url.original)
-
-
-if __name__ == '__main__':
-    print(get_unique_short_id())

@@ -8,9 +8,3 @@ class URL_map(db.Model):
     original = db.Column(db.String(256), nullable=False)
     short = db.Column(db.String(16), unique=True)
     timestamp = db.Column(db.DateTime, index=True, default=dt.utcnow)
-
-    def to_dict(self):
-        pass
-
-    def from_dict(self):
-        pass
