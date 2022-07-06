@@ -1,11 +1,11 @@
-import os
-
 from flask import abort, flash, redirect, render_template
 
 from . import app, db
 from .forms import UrlMapForm
 from .models import URL_map
 from .utils import get_unique_short_id
+
+BASE_URL = 'http://localhost/'
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -28,8 +28,7 @@ def index_view():
             short=custom_id)
         db.session.add(new_url)
         db.session.commit()
-        base_url = os.getenv('BASE_URL')
-        full_short_url = f'{base_url}{custom_id}'
+        full_short_url = f'{BASE_URL}{custom_id}'
         return render_template(
             'urlsform.html',
             form=form,

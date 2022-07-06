@@ -1,11 +1,10 @@
-import os
 from flask import jsonify, request
 
 from . import app, db
 from .error_handlers import InvalidAPIUsage
 from .models import URL_map
 from .utils import check_short_id
-from .views import get_unique_short_id
+from .views import BASE_URL, get_unique_short_id
 
 
 @app.route('/api/id/<string:short_id>/', methods=['GET'])
@@ -43,5 +42,5 @@ def create_url():
     db.session.commit()
     return jsonify(dict(
         url=new_url.original,
-        short_link=f'{os.getenv("BASE_URL")}{new_url.short}')
+        short_link=f'{BASE_URL}{new_url.short}')
     ), 201
